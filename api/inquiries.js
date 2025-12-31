@@ -26,10 +26,14 @@ const verifyToken = (req) => {
 };
 
 export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Get the origin from the request
+  const origin = req.headers.origin || req.headers.referer?.split('/').slice(0, 3).join('/');
+  
+  // Set CORS headers with proper origin
+  res.setHeader('Access-Control-Allow-Origin', origin || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-password');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
   // Handle OPTIONS request
   if (req.method === 'OPTIONS') {
