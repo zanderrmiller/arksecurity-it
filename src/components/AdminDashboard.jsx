@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-export default function AdminDashboard({ onLogout, adminPassword }) {
+export default function AdminDashboard({ onLogout }) {
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('new'); // 'new', 'completed', 'all'
+  const [filter, setFilter] = useState('new');
   const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
   useEffect(() => {
@@ -15,9 +15,7 @@ export default function AdminDashboard({ onLogout, adminPassword }) {
     try {
       const response = await fetch(`${API_BASE}/inquiries`, {
         method: 'GET',
-        headers: {
-          'x-admin-password': adminPassword
-        }
+        credentials: 'include' // Include cookies
       });
 
       if (!response.ok) {
@@ -40,9 +38,9 @@ export default function AdminDashboard({ onLogout, adminPassword }) {
       const response = await fetch(`${API_BASE}/inquiries`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'x-admin-password': adminPassword
+          'Content-Type': 'application/json'
         },
+        credentials: 'include', // Include cookies
         body: JSON.stringify({ id, status: newStatus })
       });
 
@@ -70,9 +68,9 @@ export default function AdminDashboard({ onLogout, adminPassword }) {
       const response = await fetch(`${API_BASE}/inquiries`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
-          'x-admin-password': adminPassword
+          'Content-Type': 'application/json'
         },
+        credentials: 'include', // Include cookies
         body: JSON.stringify({ id })
       });
 

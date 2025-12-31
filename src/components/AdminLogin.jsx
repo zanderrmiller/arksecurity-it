@@ -3,20 +3,44 @@ import React, { useState } from 'react';
 export default function AdminLogin({ onLoginSuccess }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'Z@nder3#';
+    setError('');
+    setIsLoading(true);
 
-    if (password === adminPassword) {
-      // Store session and password in localStorage
-      localStorage.setItem('adminSession', 'true');
-      localStorage.setItem('adminPassword', password);
-      setError('');
+    try {
+      const API_BASE = import.meta.env.VITE_API_URL || '/api';
+      
+      const response = await fetch(`${API_BASE}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include', // Include cookies
+        body: JSON.stringify({ password })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        if (response.status === 429) {
+          setError(data.error);
+        } else {
+          setError(`Invalid password. ${data.attemptsRemaining} attempts remaining.`);
+        }
+        setPassword('');
+        setIsLoading(false);
+        return;
+      }
+
+      // Cookie is automatically set by server, just redirect
       onLoginSuccess();
-    } else {
-      setError('Invalid password. Please try again.');
-      setPassword('');
+    } catch (err) {
+      setError('Login failed. Please try again.');
+      console.error('Login error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 

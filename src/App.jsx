@@ -47,7 +47,6 @@ function App() {
 
   const handleAdminLogout = () => {
     localStorage.removeItem('adminSession');
-    localStorage.removeItem('adminPassword');
     setAdminLoggedIn(false);
     window.location.hash = '#home';
   };
@@ -57,8 +56,7 @@ function App() {
     if (!adminLoggedIn) {
       return <AdminLogin onLoginSuccess={handleAdminLogin} />;
     }
-    const adminPassword = localStorage.getItem('adminPassword');
-    return <AdminDashboard onLogout={handleAdminLogout} adminPassword={adminPassword} />;
+    return <AdminDashboard onLogout={handleAdminLogout} />;
   }
 
   // Render privacy policy

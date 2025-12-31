@@ -1,16 +1,28 @@
 import { createClient } from '@supabase/supabase-js';
+import jwt from 'jsonwebtoken';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
   process.env.VITE_SUPABASE_SERVICE_KEY
 );
 
-const ADMIN_PASSWORD = process.env.VITE_ADMIN_PASSWORD;
+const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
 
-// Verify admin password from headers
-const verifyAdminPassword = (req) => {
-  const password = req.headers['x-admin-password'];
-  return password === ADMIN_PASSWORD;
+// Verify JWT from cookie
+const verifyToken = (req) => {
+  const cookies = req.headers.cookie || '';
+  const token = cookies
+    .split(';')
+    .find(c => c.trim().startsWith('adminToken='))
+    ?.split('=')[1];
+
+  if (!token) return null;
+
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    return null;
+  }
 };
 
 export default async function handler(req, res) {
@@ -24,8 +36,9 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Verify admin password
-  if (!verifyAdminPassword(req)) {
+  // Verify JWT token
+  const decoded = verifyToken(req);
+  if (!decoded) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
