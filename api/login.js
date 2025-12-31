@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const ADMIN_PASSWORD = process.env.VITE_ADMIN_PASSWORD;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
 
 // In-memory rate limiting (tracks failed attempts by IP)
